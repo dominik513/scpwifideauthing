@@ -1,0 +1,2 @@
+# scpwifideauthing
+course 1
